@@ -1,0 +1,204 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<HTML>
+<HEAD>
+
+<SCRIPT Language='VBScript'>
+
+	Sub setBPM(value,skip)
+		Set SDB = CreateObject("SongsDB.SDBApplication")
+		Dim curSong : Set curSong = SDB.Player.CurrentSong
+		curSong.BPM = value
+		curSong.UpdateDB
+		curSong.WriteTags
+		
+		If skip Then
+        	SDB.Player.Next()
+			SDB.Player.PlaybackTime = SDB.Player.CurrentSongLength*0.1
+		End If 
+		
+		Set curSong = Nothing
+		Set SDB = Nothing
+	End Sub
+	
+</SCRIPT>
+
+
+<SCRIPT language=JavaScript>
+	<!-- Original:  Derek Chilcote-Batto (dac-b@usa.net) -->
+	<!-- Web Site:  http://www.mixed.net -->
+	<!-- Modified by:  Ronnie T. Moore, Editor -->
+	<!-- Later Modified into this version by Dale de Silva (www.oiltinman.net) for use in the programming MediaMonkey (www.mediamonkey.com)
+	<!-- Ronnie T's script and many more are available free online at -->
+	<!-- The JavaScript Source!! http://javascript.internet.com -->
+	
+	<!-- Netscape 4.x+ and MSIE 4.x+ compatible. --!>
+	
+	
+	<!-- Begin
+	ns = (navigator.appName == 'Netscape');
+	ie = (navigator.appName == 'Microsoft Internet Explorer');
+	
+	secs2 = 0;
+	count = 0;
+	allBpm = 0;
+	avgBpm = 0;
+	bpm = 0;
+	
+	function resetAll() {
+		<!--reset all--!>
+		secs2 = 0;
+		count = 0;
+		allBpm = 0;
+		bpm = 0;
+		
+		BPMtoSave = avgBpm
+		avgBpm = 0;
+		
+		document.BEATSPERMINUTE.AVG.value = "";
+		document.BEATSPERMINUTE.HIT.value = "";
+		document.BEATSPERMINUTE.ACG.value = "";
+	}
+	
+	function saveBPM(){
+		if(avgBpm>0){
+			resetAll();
+			document.BEATSPERMINUTE.AVG.value = "Saved";
+			document.BEATSPERMINUTE.HIT.value = "";
+			document.BEATSPERMINUTE.ACG.value = "";
+			
+			
+			
+			//VBscript call MUST go at end or the other actions wont complete
+			if(document.BEATSPERMINUTE.SKIP.checked == true){
+				alert("save & skip")
+				setBPM(BPMtoSave,true);
+			} else {
+				alert("just save")
+				setBPM(BPMtoSave,false);
+			}
+		} else {
+
+		}
+	}
+	
+	function bpmCounter(e) {
+
+		//if (ns) clearBpm = e.which;
+		//else if (ie) clearBpm = event.button;
+		
+		timeSeconds = new Date;
+		secs = timeSeconds.getTime();
+		
+		if (count == 0) {
+			document.BEATSPERMINUTE.AVG.value = "Begin When Ready";
+			document.BEATSPERMINUTE.HIT.value = "";
+			document.BEATSPERMINUTE.ACG.value = "";
+			count = "start"
+		} else if (count == "start"){
+			document.BEATSPERMINUTE.AVG.value = "1st Click";
+			document.BEATSPERMINUTE.HIT.value = "";
+			document.BEATSPERMINUTE.ACG.value = "";
+			count = 1
+			secs2 = secs;
+		} else {
+			oldBpm = bpm;
+			bpm = (1 / ((secs - secs2) / 1000)) * 60;
+			bpmChg = (Math.round((bpm - oldBpm) * 10)) / 10;
+			count++;
+			allBpm = allBpm + bpm;
+			oldAvg = avgBpm;
+			avgBpm = allBpm / (count - 1);
+			avgChg = (Math.round((avgBpm - oldAvg) * 10)) / 10;
+			secs2 = secs;
+			if (bpmChg >= 0) {
+				PbpmChg = "+" + bpmChg
+			} else {
+				PbpmChg = bpmChg
+			}
+			if (avgChg >= 0) {
+				PavgChg = "+" + avgChg
+			} else {
+				PavgChg = avgChg
+			}
+			document.BEATSPERMINUTE.AVG.value = (Math.round(avgBpm * 100)) / 100;
+			document.BEATSPERMINUTE.ACG.value = PavgChg;
+			document.BEATSPERMINUTE.HIT.value = count;
+		}
+		return true;
+	}
+	//document.onkeydown = bpmCounter;
+	//document.onmousedown = bpmCounter;
+	//  End -->
+	
+</SCRIPT>
+
+<STYLE type="text/css">
+	
+	h1 {
+		font-size: 11px;
+		font-family:Verdana, Arial, Helvetica, sans-serif;
+		text-align: center;
+		color: #999999;
+		
+	}
+	
+	h2 {
+		font-size: 10px;
+		font-family:Verdana, Arial, Helvetica, sans-serif;
+		text-align: center;
+		color: #999999;
+	}
+	
+	h3 {
+		font-size: 9px;
+		font-family:Verdana, Arial, Helvetica, sans-serif;
+		text-align: center;
+		color: #BBBBBB;
+	}
+	
+	feedback {
+		font-size: 15px;
+		font-family:Verdana, Arial, Helvetica, sans-serif;
+		color: #000000;
+		text-align: right;
+	}
+		
+	html {
+	   overflow:false;
+	}
+	
+body {
+	margin-left: 0px;
+	margin-top: 0px;
+	margin-right: 0px;
+	margin-bottom: 0px;
+}
+</STYLE>
+
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"></HEAD>
+<BODY bgColor=#FFFFFF>
+
+<FORM name=BEATSPERMINUTE>
+	<table width="100%" height="100%" border="0">
+      <tr>
+        <td>
+		  <h2>
+		  <input name="tap" type=button value="         TAP         " onMouseDown="bpmCounter(null)" onKeyPress="bpmCounter(null)">
+		  <BR/>
+		  <input name="reset" type=button value="RESET " onClick="resetAll()">
+		  <input name="save" type=button value="SAVE " onClick="saveBPM()">
+		  <BR/>
+		  <INPUT size=17 name=AVG>
+		  <BR/>
+		  Diff. <input size=2 name=ACG> No. <INPUT size=2 name=HIT>
+		  <BR/>
+		  Skip Song On Save <input name=SKIP type="checkbox" value="skip"></h2>
+		  <h3>If clicking "TAP" with your mouse doesn't seem to be registering every hit.. use you spacebar
+		  </h3>
+		</td>
+      </tr>
+    </table>
+</FORM>
+
+</BODY></HTML>
